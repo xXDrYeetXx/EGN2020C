@@ -1,3 +1,5 @@
+// We have to load a library --> Arduino IDE → Sketch → Include Library → Manage Libraries (or Tools → Manage Libraries, depending on your IDE version) → search "IRremote" → install the one by shirriff / z3t0 / Armin Joachimsmeyer
+
 #include <AccelStepper.h>
 #include <IRremote.h> //for remote control
 
