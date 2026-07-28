@@ -1,11 +1,16 @@
 #include <AccelStepper.h>
+#include <IRremote.h> //for remote control
+
 //-------------------------------
 //you can change these
+const int ir_receive_pin = 13;
 const int force_pin = A0;
 const int led_pin = 2;
 const int force_threshold = 500;
 const int tray_degs = 360;
 const int door_degs = 360;
+
+const unsigned long DOOR_REMOTE_CODE = 0xFF906F; //establishes which button to use (up button)
 //---------------------------------
 class SpoolAssembly {
   private:
@@ -80,6 +85,7 @@ SpoolAssembly door(5, 6, 7, 12, 4);
 void setup() {
   Serial.begin(9600);
   pinMode(led_pin, OUTPUT);
+  IrReceiver.begin(ir_receive_pin, ENABLE_LED_FEEDBACK);
 }
 
 void loop() {
@@ -91,6 +97,8 @@ void loop() {
   if (tray.button_pressed()) tray.toggle(tray_degs);
   if (door.button_pressed()) door.toggle(door_degs);
 
+  handleDoorRemote(); // constantly checks if the remote button has been pressed or not
+  
   // must run every iteration, unconditionally, so each motor keeps stepping toward its target
   tray.run();
   door.run();
@@ -99,4 +107,13 @@ void loop() {
 bool detect_mail() {
   if (analogRead(force_pin) > force_threshold) return true;
   return false;
+}
+
+void handleDoorRemote() {
+  if (IrReceiver.decode()) {
+    if (IrReceiver.decodedIRData.decodedRawData == DOOR_REMOTE_CODE) {
+      door.toggle(door_degs);
+    }
+    IrReceiver.resume();
+  }
 }
