@@ -221,30 +221,22 @@ void handleDoorRemote() {
       IrReceiver.decodedIRData.command;
 
 
-    Serial.print("Remote command: 0x");
+    Serial.print("Remote button received: 0x");
     Serial.println(command, HEX);
 
 
-    if (command == DOOR_REMOTE_COMMAND) {
+    if (millis() - last_remote_press > remote_delay) {
 
-      if (millis() - last_remote_press > remote_delay) {
+      Serial.println("IR button detected!");
+      Serial.println("Toggling door motor...");
 
-        Serial.println("Remote button detected!");
-        Serial.println("Toggling door motor...");
+      door.toggle(door_degs);
 
-        door.toggle(door_degs);
-
-        last_remote_press = millis();
-
-      } else {
-
-        Serial.println("Ignoring repeated IR signal");
-      }
-
+      last_remote_press = millis();
 
     } else {
 
-      Serial.println("Unknown remote button");
+      Serial.println("Ignoring repeated IR signal");
     }
 
 
